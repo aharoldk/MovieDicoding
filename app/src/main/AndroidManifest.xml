@@ -21,7 +21,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".DetailActivity" />
+        <activity android:name=".DetailActivity"
+            android:theme="@style/AppTheme.NoActionBar"/>
 
         <service android:name=".utils.gcmplayservices.SchedulerService"
             android:permission="com.google.android.gms.permission.BIND_NETWORK_TASK_SERVICE"

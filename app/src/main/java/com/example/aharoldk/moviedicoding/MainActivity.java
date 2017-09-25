@@ -1,8 +1,5 @@
 package com.example.aharoldk.moviedicoding;
 
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
@@ -28,7 +25,9 @@ import com.example.aharoldk.moviedicoding.utils.alarm.AlarmPreference;
 import com.example.aharoldk.moviedicoding.utils.alarm.AlarmReceiver;
 import com.example.aharoldk.moviedicoding.utils.gcmplayservices.SchedulerTask;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 import butterknife.BindView;
@@ -43,11 +42,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @BindView(R.id.btnCari) Button btnSearch;
     @BindView(R.id.rvMain) RecyclerView rvMain;
 
-    static final String API_KEYS = "3ee47da55c8dae070eb764306712efc3";
-    static final String LANG = "en-US";
-
     private List<ResultsItem> list = new ArrayList<>();
     private MovieAdapter mAdapter;
+
+    String search;
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
@@ -57,6 +55,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         declarate();
         setAlarm();
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        search = etSearch.getText().toString();
+        outState.putString("search", search);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        search = savedInstanceState.getString("search");
+        parteeeehRetrofit(search);
+
     }
 
     private void declarate() {
@@ -74,8 +87,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         rvMain.setNestedScrollingEnabled(false);
         rvMain.setAdapter(mAdapter);
 
-
         mAdapter.setItemClickListener(this);
+
     }
 
 
@@ -110,7 +123,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void checkSearchEditText() {
-        String search = etSearch.getText().toString();
+        search = etSearch.getText().toString();
 
         if(!TextUtils.isEmpty(search)){
             parteeeehRetrofit(search);
@@ -122,7 +135,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private void parteeeehRetrofit(String search) {
         APIInterface apiInterface = APIClient.getApiClient().create(APIInterface.class);
 
-        Call<Movie> call = apiInterface.getSearchMovie(API_KEYS, LANG, search);
+        Call<Movie> call = apiInterface.getSearchMovie(BuildConfig.API_KEY, BuildConfig.LANG, search);
 
         call.enqueue(new Callback<Movie>() {
             @Override
@@ -168,4 +181,5 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onBackPressed();
         finish();
     }
+
 }

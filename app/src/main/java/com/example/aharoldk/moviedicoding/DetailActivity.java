@@ -3,7 +3,12 @@ package com.example.aharoldk.moviedicoding;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -22,9 +27,6 @@ import retrofit2.Response;
 public class DetailActivity extends AppCompatActivity {
     public static final String ID_MOVIE = "idMovie";
 
-    static final String API_KEYS = "3ee47da55c8dae070eb764306712efc3";
-    static final String LANG = "en-US";
-
     @BindView(R.id.ivPoster) ImageView ivPoster;
     @BindView(R.id.tvTitle) TextView tvTitle;
     @BindView(R.id.tvDate) TextView tvDate;
@@ -33,20 +35,45 @@ public class DetailActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        getWindow().getDecorView().setSystemUiVisibility(
+                        View.SYSTEM_UI_FLAG_HIDE_NAVIGATION // hide nav bar
+                        // remove the following flag for version < API 19
+                        | View.SYSTEM_UI_FLAG_IMMERSIVE
+        );
         setContentView(R.layout.activity_detail);
+
 
         String idMovie = getIntent().getStringExtra(ID_MOVIE);
 
-        Toast.makeText(this, ""+idMovie, Toast.LENGTH_SHORT).show();
         ButterKnife.bind(this);
         
         retrofit(idMovie);
+
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
+        // add back arrow to toolbar
+        if (getSupportActionBar() != null){
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setDisplayShowHomeEnabled(true);
+        }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // handle arrow click here
+        if (item.getItemId() == android.R.id.home) {
+            finish(); // close this activity and return to preview activity (if there is any)
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 
     private void retrofit(String idMovie) {
         APIInterface apiInterface = APIClient.getApiClient().create(APIInterface.class);
 
-        Call<Detail> call = apiInterface.getDetailMovie(idMovie, API_KEYS, LANG);
+        Call<Detail> call = apiInterface.getDetailMovie(idMovie, BuildConfig.API_KEY, BuildConfig.LANG);
 
         call.enqueue(new Callback<Detail>() {
             @Override
